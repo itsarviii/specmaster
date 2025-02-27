@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -7,6 +8,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { signUp } from "@/lib/actions/auth"
 
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -20,14 +22,21 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>
 
 export function SignUpForm() {
+  const [serverError, setServerError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>({ resolver: zodResolver(schema) })
 
-  async function onSubmit(_values: FormValues) {
-    // auth — next commit
+  function onSubmit(values: FormValues) {
+    setServerError(null)
+    startTransition(async () => {
+      const result = await signUp(values.email, values.password)
+      if (result?.error) setServerError(result.error)
+    })
   }
 
   return (
@@ -81,8 +90,12 @@ export function SignUpForm() {
             )}
           </div>
 
-          <Button type="submit" className="w-full mt-2">
-            Create account
+          {serverError && (
+            <p className="text-xs text-destructive text-center">{serverError}</p>
+          )}
+
+          <Button type="submit" className="w-full mt-2" disabled={isPending}>
+            {isPending ? "Creating account…" : "Create account"}
           </Button>
         </form>
       </div>
