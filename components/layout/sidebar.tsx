@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import type { Profile } from "@/lib/types"
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -24,7 +26,11 @@ const navItems = [
   { label: "Profile", href: "/profile", icon: User },
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  profile: Profile | null
+}
+
+export function Sidebar({ profile }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -34,6 +40,10 @@ export function Sidebar() {
     toast.success("Signed out")
     router.push("/sign-in")
   }
+
+  const initials = profile?.display_name
+    ? profile.display_name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "?"
 
   return (
     <aside className="hidden lg:flex flex-col fixed inset-y-0 left-0 w-64 border-r border-border bg-card z-40">
@@ -65,7 +75,24 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-3 border-t border-border shrink-0">
+      <div className="p-3 border-t border-border shrink-0 space-y-1">
+        <Link
+          href="/profile"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors"
+        >
+          <Avatar className="size-7 shrink-0">
+            <AvatarImage src={profile?.avatar_url ?? undefined} />
+            <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <p className="text-sm font-medium truncate leading-none">
+              {profile?.display_name ?? "Your profile"}
+            </p>
+          </div>
+        </Link>
+
         <button
           onClick={handleSignOut}
           className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
