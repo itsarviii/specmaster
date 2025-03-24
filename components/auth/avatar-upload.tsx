@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { Camera } from "lucide-react"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -15,6 +16,7 @@ export function AvatarUpload({ currentUrl, initials }: AvatarUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentUrl)
   const [isPending, startTransition] = useTransition()
   const inputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -33,6 +35,7 @@ export function AvatarUpload({ currentUrl, initials }: AvatarUploadProps) {
         setPreview(currentUrl)
       } else {
         toast.success("Avatar updated")
+        router.refresh()
       }
     })
   }
