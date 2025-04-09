@@ -1,3 +1,4 @@
+import { RecipeCard } from "@/components/recipes/recipe-card"
 import type { Recipe } from "@/lib/types"
 
 interface RecipeGridProps {
@@ -18,9 +19,11 @@ export function RecipeGrid({ recipes, savedIds }: RecipeGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {recipes.map((recipe) => (
-        <div key={recipe.id} className="rounded-xl border border-border bg-card overflow-hidden">
-          <p className="p-4 text-sm font-medium">{recipe.name}</p>
-        </div>
+        <RecipeCard
+          key={recipe.id}
+          recipe={recipe}
+          isSaved={savedIds.includes(recipe.id)}
+        />
       ))}
     </div>
   )
