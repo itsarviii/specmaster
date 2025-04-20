@@ -4,6 +4,7 @@ import { getRecipes, getSavedRecipeIds } from "@/lib/db/recipes"
 import { PageHeader } from "@/components/layout/page-header"
 import { RecipeGrid } from "@/components/recipes/recipe-grid"
 import { RecipeSearch } from "@/components/recipes/recipe-search"
+import { RecipeFilters } from "@/components/recipes/recipe-filters"
 import { RECIPES_PER_PAGE } from "@/lib/constants"
 
 interface SearchParams {
@@ -41,6 +42,13 @@ export default async function RecipesPage({
 
       <Suspense>
         <RecipeSearch initialValue={params.q ?? ""} />
+        <div className="mt-4">
+          <RecipeFilters
+            initialSpirit={params.spirit}
+            initialDifficulty={params.difficulty}
+            initialMethod={params.method}
+          />
+        </div>
       </Suspense>
 
       <RecipeGrid recipes={recipes} savedIds={savedIds} />
