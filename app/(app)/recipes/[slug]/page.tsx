@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getRecipeBySlug, getSimilarRecipes, getSavedRecipeIds } from "@/lib/db/recipes"
 import { PageHeader } from "@/components/layout/page-header"
 import { RecipeCard } from "@/components/recipes/recipe-card"
+import { SaveButton } from "@/components/recipes/save-button"
 import { Badge } from "@/components/ui/badge"
 import { SPIRIT_LABELS, DIFFICULTY_LABELS, METHOD_LABELS } from "@/lib/constants"
 import type { Metadata } from "next"
@@ -40,7 +41,7 @@ export default async function RecipeDetailPage({
     <div className="space-y-10 max-w-2xl">
       <div className="space-y-6">
         {recipe.image_url && (
-          <div className="relative aspect-[16/9] rounded-xl overflow-hidden">
+          <div className="relative aspect-video rounded-xl overflow-hidden">
             <Image
               src={recipe.image_url}
               alt={recipe.name}
@@ -53,7 +54,10 @@ export default async function RecipeDetailPage({
         )}
 
         <div className="space-y-3">
-          <h1 className="font-display text-3xl font-semibold">{recipe.name}</h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="font-display text-3xl font-semibold">{recipe.name}</h1>
+            <SaveButton recipeId={recipe.id} initialSaved={savedIds.includes(recipe.id)} className="size-10 shrink-0" />
+          </div>
 
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="secondary">

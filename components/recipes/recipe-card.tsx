@@ -1,9 +1,9 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Clock } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { SPIRIT_LABELS, DIFFICULTY_LABELS } from "@/lib/constants"
+import { SaveButton } from "@/components/recipes/save-button"
 import type { Recipe } from "@/lib/types"
 
 const SPIRIT_COLORS: Record<string, string> = {
@@ -57,6 +57,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           <h3 className="font-display font-semibold text-sm leading-snug line-clamp-2">
             {recipe.name}
           </h3>
+          <SaveButton recipeId={recipe.id} initialSaved={!!isSaved} className="size-7 shrink-0 -mr-1 -mt-1" />
         </div>
 
         <div className="flex items-center gap-1.5 flex-wrap mt-auto">
