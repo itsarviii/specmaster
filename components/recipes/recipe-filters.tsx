@@ -54,10 +54,11 @@ export function RecipeFilters({
   }
 
   function clearAll() {
-    const params = new URLSearchParams()
     const q = searchParams.get("q")
+    const params = new URLSearchParams()
     if (q) params.set("q", q)
-    router.push(`${pathname}?${params.toString()}`)
+    const qs = params.toString()
+    router.push(qs ? `${pathname}?${qs}` : pathname)
   }
 
   const spirit = searchParams.get("spirit") ?? initialSpirit
