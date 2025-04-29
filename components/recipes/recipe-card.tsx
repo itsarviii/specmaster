@@ -30,7 +30,7 @@ interface RecipeCardProps {
   isSaved?: boolean
 }
 
-export function RecipeCard({ recipe }: RecipeCardProps) {
+export function RecipeCard({ recipe, isSaved }: RecipeCardProps) {
   return (
     <Link
       href={`/recipes/${recipe.slug}`}
