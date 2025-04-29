@@ -1,4 +1,6 @@
 import { Suspense } from "react"
+import Link from "next/link"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getRecipes, getSavedRecipeIds } from "@/lib/db/recipes"
 import { PageHeader } from "@/components/layout/page-header"
@@ -54,9 +56,35 @@ export default async function RecipesPage({
       <RecipeGrid recipes={recipes} savedIds={savedIds} />
 
       {totalPages > 1 && (
-        <p className="text-center text-sm text-muted-foreground">
-          Page {page} of {totalPages}
-        </p>
+        <div className="flex items-center justify-center gap-2">
+          {page > 1 ? (
+            <Link
+              href={`/recipes?${new URLSearchParams({ ...params, page: String(page - 1) }).toString()}`}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border bg-card text-sm hover:border-primary/40 transition-colors"
+            >
+              <ChevronLeft className="size-4" /> Prev
+            </Link>
+          ) : (
+            <span className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border bg-card text-sm text-muted-foreground opacity-50 cursor-not-allowed">
+              <ChevronLeft className="size-4" /> Prev
+            </span>
+          )}
+          <span className="text-sm text-muted-foreground px-2">
+            {page} / {totalPages}
+          </span>
+          {page < totalPages ? (
+            <Link
+              href={`/recipes?${new URLSearchParams({ ...params, page: String(page + 1) }).toString()}`}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border bg-card text-sm hover:border-primary/40 transition-colors"
+            >
+              Next <ChevronRight className="size-4" />
+            </Link>
+          ) : (
+            <span className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border bg-card text-sm text-muted-foreground opacity-50 cursor-not-allowed">
+              Next <ChevronRight className="size-4" />
+            </span>
+          )}
+        </div>
       )}
     </div>
   )
