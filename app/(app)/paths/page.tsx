@@ -14,6 +14,7 @@ export default async function PathsPage() {
   ])
 
   const enrolledPathIds = new Set(enrollments.map((e) => e.path_id))
+  const completedSet = new Set(completedLessonIds)
 
   return (
     <div className="space-y-8">
@@ -29,13 +30,15 @@ export default async function PathsPage() {
             {paths
               .filter((p) => enrolledPathIds.has(p.id))
               .map((path) => {
-                const enrollment = enrollments.find((e) => e.path_id === path.id)
+                const allIds = (path.path_modules ?? []).flatMap((m) => (m.lessons ?? []).map((l) => l.id))
+                const done = allIds.filter((id) => completedSet.has(id)).length
+                const progress = allIds.length > 0 ? Math.round((done / allIds.length) * 100) : 0
                 return (
                   <PathCard
                     key={path.id}
                     path={path}
                     enrolled
-                    progress={enrollment?.completed_at ? 100 : undefined}
+                    progress={progress}
                   />
                 )
               })}

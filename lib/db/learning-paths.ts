@@ -1,14 +1,14 @@
 import { createClient } from "@/lib/supabase/server"
 import type { LearningPath, PathModule, Lesson, UserPathEnrollment } from "@/lib/types"
 
-export async function getLearningPaths(): Promise<LearningPath[]> {
+export async function getLearningPaths() {
   const supabase = await createClient()
   const { data } = await supabase
     .from("learning_paths")
-    .select("*")
+    .select("*, path_modules(lessons(id))")
     .eq("is_published", true)
     .order("sort_order")
-  return (data ?? []) as LearningPath[]
+  return (data ?? []) as (LearningPath & { path_modules: { lessons: { id: string }[] }[] })[]
 }
 
 export async function getLearningPathBySlug(slug: string) {
