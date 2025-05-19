@@ -24,12 +24,12 @@ export async function getLearningPathBySlug(slug: string) {
   return {
     ...data,
     path_modules: (data.path_modules ?? [])
-      .sort((a: PathModule, b: PathModule) => a.sort_order - b.sort_order)
+      .sort((a: PathModule, b: PathModule) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
       .map((m: PathModule & { lessons: Lesson[] }) => ({
         ...m,
         lessons: (m.lessons ?? [])
           .filter((l: Lesson) => l.is_published)
-          .sort((a: Lesson, b: Lesson) => a.sort_order - b.sort_order),
+          .sort((a: Lesson, b: Lesson) => (a.sort_order ?? 0) - (b.sort_order ?? 0)),
       })),
   }
 }
