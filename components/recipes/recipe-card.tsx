@@ -52,7 +52,7 @@ export function RecipeCard({ recipe, isSaved }: RecipeCardProps) {
         )}
       </div>
 
-      <div className="flex flex-col flex-1 p-4 gap-3">
+      <div className="flex flex-col flex-1 p-3 sm:p-4 gap-2 sm:gap-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-display font-semibold text-sm leading-snug line-clamp-2">
             {recipe.name}

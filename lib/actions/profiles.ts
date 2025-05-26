@@ -4,14 +4,14 @@ import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import type { ExperienceLevel, UserRole } from "@/lib/types"
 
-export async function completeOnboardingAction(experience_level: ExperienceLevel, role: UserRole) {
+export async function completeOnboardingAction(experience_level: ExperienceLevel, role: UserRole, display_name: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Not authenticated" }
 
   const { error } = await supabase
     .from("profiles")
-    .update({ experience_level, role, onboarding_done: true, updated_at: new Date().toISOString() })
+    .update({ experience_level, role, display_name: display_name.trim(), onboarding_done: true, updated_at: new Date().toISOString() })
     .eq("id", user.id)
 
   if (error) return { error: error.message }
@@ -31,6 +31,21 @@ export async function updateProfileAction(updates: { display_name?: string; bio?
   if (error) return { error: error.message }
   revalidatePath("/profile")
   revalidatePath("/settings")
+  return { success: true }
+}
+
+export async function selectAvatarPresetAction(index: number) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Not authenticated" }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ avatar_url: `preset:${index}`, updated_at: new Date().toISOString() })
+    .eq("id", user.id)
+
+  if (error) return { error: error.message }
+  revalidatePath("/profile")
   return { success: true }
 }
 

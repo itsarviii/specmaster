@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { GlassWater, Wine, Martini, Trophy, Home, Users, Star } from "lucide-react"
+import { GlassWater, Wine, Trophy, Home, Users, Star } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { completeOnboardingAction } from "@/lib/actions/profiles"
 import type { ExperienceLevel, UserRole } from "@/lib/types"
 
@@ -52,19 +54,20 @@ const roleOptions: { value: UserRole; label: string; description: string; icon: 
 
 export function OnboardingFlow() {
   const [step, setStep] = useState<1 | 2>(1)
+  const [name, setName] = useState("")
   const [experience, setExperience] = useState<ExperienceLevel | null>(null)
   const [role, setRole] = useState<UserRole | null>(null)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
   function handleNext() {
-    if (step === 1 && experience) setStep(2)
+    if (step === 1 && name.trim() && experience) setStep(2)
   }
 
   function handleSubmit() {
-    if (!experience || !role) return
+    if (!experience || !role || !name.trim()) return
     startTransition(async () => {
-      const result = await completeOnboardingAction(experience, role)
+      const result = await completeOnboardingAction(experience, role, name.trim())
       if (!result?.error) router.push("/dashboard")
     })
   }
@@ -79,11 +82,25 @@ export function OnboardingFlow() {
       {step === 1 && (
         <div className="animate-slide-up">
           <div className="text-center mb-8">
-            <h1 className="font-display text-2xl font-semibold mb-2">What's your experience level?</h1>
-            <p className="text-sm text-muted-foreground">We'll tailor your learning path to match where you are.</p>
+            <h1 className="font-display text-2xl font-semibold mb-2">Welcome to SpecMaster</h1>
+            <p className="text-sm text-muted-foreground">Let's set up your profile before you start.</p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-6">
+            <div className="space-y-1.5">
+              <Label htmlFor="name">What should we call you?</Label>
+              <Input
+                id="name"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoFocus
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>What's your experience level?</Label>
+              <div className="space-y-3">
             {experienceOptions.map(({ value, label, description, icon: Icon }) => (
               <button
                 key={value}
@@ -107,12 +124,14 @@ export function OnboardingFlow() {
                 </div>
               </button>
             ))}
+              </div>
+            </div>
           </div>
 
           <Button
             className="w-full mt-6"
             onClick={handleNext}
-            disabled={!experience}
+            disabled={!experience || !name.trim()}
           >
             Continue
           </Button>

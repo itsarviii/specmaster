@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { getAvatarPreset } from "@/lib/avatar-presets"
 import type { Profile } from "@/lib/types"
 
 const navItems = [
@@ -41,9 +41,7 @@ export function Sidebar({ profile }: SidebarProps) {
     router.push("/sign-in")
   }
 
-  const initials = profile?.display_name
-    ? profile.display_name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-    : "?"
+
 
   return (
     <aside className="hidden lg:flex flex-col fixed inset-y-0 left-0 w-64 border-r border-border bg-card z-40">
@@ -80,12 +78,14 @@ export function Sidebar({ profile }: SidebarProps) {
           href="/profile"
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors"
         >
-          <Avatar className="size-7 shrink-0">
-            <AvatarImage src={profile?.avatar_url ?? undefined} />
-            <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          {(() => {
+            const p = getAvatarPreset(profile?.avatar_url ?? null)
+            return (
+              <div className={`size-7 shrink-0 rounded-full border flex items-center justify-center text-base ${p.bg} ${p.border}`}>
+                {p.emoji}
+              </div>
+            )
+          })()}
           <div className="min-w-0">
             <p className="text-sm font-medium truncate leading-none">
               {profile?.display_name ?? "Your profile"}

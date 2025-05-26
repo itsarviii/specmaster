@@ -60,6 +60,18 @@ export async function getSimilarRecipes(currentId: string, spirit: string, limit
   return (data ?? []) as Recipe[]
 }
 
+export async function getSpotlightRecipe(): Promise<Recipe | null> {
+  const supabase = await createClient()
+  const dayOffset = Math.floor(Date.now() / 86400000) % 80
+  const { data } = await supabase
+    .from("recipes")
+    .select("id,slug,name,image_url,spirit_category,difficulty,prep_time_mins,glassware,method,flavor_tags,created_at,is_published")
+    .eq("is_published", true)
+    .order("name")
+    .range(dayOffset, dayOffset)
+  return (data?.[0] ?? null) as Recipe | null
+}
+
 export async function getSavedRecipeIds(userId: string): Promise<string[]> {
   const supabase = await createClient()
   const { data } = await supabase

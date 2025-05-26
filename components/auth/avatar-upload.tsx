@@ -10,9 +10,10 @@ import { uploadAvatarAction } from "@/lib/actions/profiles"
 interface AvatarUploadProps {
   currentUrl: string | null
   initials: string
+  sizeClassName?: string
 }
 
-export function AvatarUpload({ currentUrl, initials }: AvatarUploadProps) {
+export function AvatarUpload({ currentUrl, initials, sizeClassName = "size-20" }: AvatarUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentUrl)
   const [isPending, startTransition] = useTransition()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -42,7 +43,7 @@ export function AvatarUpload({ currentUrl, initials }: AvatarUploadProps) {
 
   return (
     <div className="relative shrink-0">
-      <Avatar className="size-20 ring-2 ring-primary/30 ring-offset-2 ring-offset-background">
+      <Avatar className={`${sizeClassName} ring-2 ring-primary/30 ring-offset-2 ring-offset-background`}>
         <AvatarImage src={preview ?? undefined} alt="Avatar" />
         <AvatarFallback className="bg-primary/10 text-primary font-display text-xl">
           {initials}
