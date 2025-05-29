@@ -2,6 +2,48 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { BADGE_SLUGS } from "@/lib/constants"
+
+async function tryAwardBadge(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  slug: string
+) {
+  const { data: badge } = await supabase.from("badges").select("id").eq("slug", slug).single()
+  if (!badge) return
+  await supabase.from("user_badges").insert({ user_id: userId, badge_id: badge.id })
+}
+
+async function updateStreak(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const today = new Date().toISOString().split("T")[0]
+  const { data: streak } = await supabase
+    .from("user_streaks")
+    .select("*")
+    .eq("user_id", userId)
+    .single()
+
+  if (!streak) {
+    await supabase.from("user_streaks").insert({
+      user_id: userId, current_streak: 1, longest_streak: 1, last_active_date: today,
+    })
+    return 1
+  }
+
+  if (streak.last_active_date === today) return streak.current_streak
+
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayStr = yesterday.toISOString().split("T")[0]
+  const newStreak = streak.last_active_date === yesterdayStr ? streak.current_streak + 1 : 1
+  const longest = Math.max(newStreak, streak.longest_streak)
+
+  await supabase
+    .from("user_streaks")
+    .update({ current_streak: newStreak, longest_streak: longest, last_active_date: today })
+    .eq("user_id", userId)
+
+  return newStreak
+}
 
 export async function enrollInPath(pathId: string) {
   const supabase = await createClient()
@@ -55,6 +97,19 @@ export async function completeLesson(lessonId: string, pathId: string, xpReward:
     source_id: lessonId,
   })
 
+  // Streak + badges
+  const newStreak = await updateStreak(supabase, user.id)
+
+  const { count: lessonCount } = await supabase
+    .from("user_lesson_completions")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+
+  if ((lessonCount ?? 0) === 1) await tryAwardBadge(supabase, user.id, BADGE_SLUGS.FIRST_LESSON_COMPLETE)
+  if (newStreak >= 7) await tryAwardBadge(supabase, user.id, BADGE_SLUGS.STREAK_7)
+  if (newStreak >= 30) await tryAwardBadge(supabase, user.id, BADGE_SLUGS.STREAK_30)
+
+  // Check path completion
   const { data: path } = await supabase
     .from("learning_paths")
     .select("path_modules(lessons(id, is_published))")
@@ -79,10 +134,13 @@ export async function completeLesson(lessonId: string, pathId: string, xpReward:
         .update({ completed_at: new Date().toISOString() })
         .eq("user_id", user.id)
         .eq("path_id", pathId)
+
+      await tryAwardBadge(supabase, user.id, BADGE_SLUGS.FIRST_PATH_COMPLETE)
     }
   }
 
   revalidatePath("/paths")
   revalidatePath("/dashboard")
+  revalidatePath("/profile")
   return { success: true, xpEarned: xpReward }
 }
