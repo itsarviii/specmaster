@@ -165,29 +165,7 @@ export type UserStreak = {
 }
 
 export type GameMode = "flashcard" | "ingredient_challenge" | "name_that_cocktail"
-export type GameScope = "saved" | "path" | "random"
-
-export type GameSession = {
-  id: string
-  user_id: string
-  mode: GameMode
-  scope: GameScope
-  scope_ref: string | null
-  total_questions: number
-  correct_answers: number
-  xp_earned: number
-  started_at: string
-  completed_at: string | null
-}
-
-export type GameSessionAnswer = {
-  id: string
-  session_id: string
-  recipe_id: string
-  was_correct: boolean
-  time_taken_ms: number | null
-  answered_at: string
-}
+export type GameScope = "saved" | "random"
 
 export type NavItem = {
   label: string
