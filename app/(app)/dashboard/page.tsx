@@ -1,10 +1,11 @@
 import Link from "next/link"
-import { ChevronRight, BookOpen, GraduationCap, Clock } from "lucide-react"
+import { ChevronRight, BookOpen, GraduationCap, Clock, Flame } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getInProgressPath } from "@/lib/db/learning-paths"
 import { getDashboardStats } from "@/lib/db/stats"
 import { getSpotlightRecipe } from "@/lib/db/recipes"
 import { getProfile } from "@/lib/db/profiles"
+import { getUserStreak } from "@/lib/db/games"
 import { SPIRIT_LABELS, DIFFICULTY_LABELS } from "@/lib/constants"
 
 function getGreeting() {
@@ -19,11 +20,12 @@ export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [profile, inProgress, stats, spotlight] = await Promise.all([
+  const [profile, inProgress, stats, spotlight, streak] = await Promise.all([
     user ? getProfile(user.id) : null,
     user ? getInProgressPath(user.id) : null,
     user ? getDashboardStats(user.id) : null,
     getSpotlightRecipe(),
+    user ? getUserStreak(user.id) : null,
   ])
 
   const firstName = profile?.display_name?.split(" ")[0] ?? "there"
@@ -33,7 +35,15 @@ export default async function DashboardPage() {
 
       {/* Hero greeting */}
       <div className="pt-1">
-        <p className="text-sm text-muted-foreground">{getGreeting()}</p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-sm text-muted-foreground">{getGreeting()}</p>
+          {streak && streak.current_streak > 0 && (
+            <div className="flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/8 px-2.5 py-1 shrink-0">
+              <Flame className="size-3.5 text-orange-500" />
+              <span className="text-xs font-semibold text-orange-500">{streak.current_streak} day streak</span>
+            </div>
+          )}
+        </div>
         <h1 className="font-display text-4xl font-bold tracking-tight mt-1">
           {firstName} <span className="text-primary">·</span>
         </h1>
