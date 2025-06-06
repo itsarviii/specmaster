@@ -2,9 +2,11 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getProfile } from "@/lib/db/profiles"
 import { getDashboardStats } from "@/lib/db/stats"
+import { getUserBadges, getUserStreak } from "@/lib/db/games"
 import { ProfileHero } from "@/components/profile/profile-hero"
+import { BadgeShelf } from "@/components/profile/badge-shelf"
 import { LEVEL_TITLES } from "@/lib/constants"
-import { BookMarked, GraduationCap, Zap, BookOpen } from "lucide-react"
+import { BookMarked, GraduationCap, Zap, BookOpen, Flame } from "lucide-react"
 
 const XP_PER_LEVEL = 200
 
@@ -23,9 +25,11 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/sign-in")
 
-  const [profile, stats] = await Promise.all([
+  const [profile, stats, userBadges, streak] = await Promise.all([
     getProfile(user.id),
     getDashboardStats(user.id),
+    getUserBadges(user.id),
+    getUserStreak(user.id),
   ])
 
   const level = getLevelInfo(stats.totalXp)
@@ -73,6 +77,28 @@ export default async function ProfilePage() {
           <p className="font-display text-2xl font-bold leading-none">{stats.savedRecipes}</p>
           <p className="text-xs text-muted-foreground">Recipes saved</p>
         </div>
+      </div>
+
+      {/* Streak */}
+      {streak && streak.current_streak > 0 && (
+        <div className="rounded-xl border border-border bg-card p-4 flex items-center gap-4">
+          <div className="size-10 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
+            <Flame className="size-5 text-orange-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm">{streak.current_streak}-day streak</p>
+            <p className="text-xs text-muted-foreground">Longest: {streak.longest_streak} days</p>
+          </div>
+          <p className="font-display text-3xl font-bold text-orange-500 shrink-0">{streak.current_streak}</p>
+        </div>
+      )}
+
+      {/* Badges */}
+      <div className="space-y-3">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          Badges · {userBadges.filter((ub) => ub.badges !== null).length} earned
+        </p>
+        <BadgeShelf userBadges={userBadges as Parameters<typeof BadgeShelf>[0]["userBadges"]} />
       </div>
 
     </div>
