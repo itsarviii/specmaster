@@ -2,9 +2,10 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getProfile } from "@/lib/db/profiles"
 import { getDashboardStats } from "@/lib/db/stats"
-import { getUserBadges, getUserStreak } from "@/lib/db/games"
+import { getAllBadges, getUserBadges, getUserStreak } from "@/lib/db/games"
 import { ProfileHero } from "@/components/profile/profile-hero"
 import { BadgeShelf } from "@/components/profile/badge-shelf"
+import { DeleteAccountButton } from "@/components/profile/delete-account-button"
 import { LEVEL_TITLES } from "@/lib/constants"
 import { BookMarked, GraduationCap, Zap, BookOpen, Flame } from "lucide-react"
 
@@ -25,9 +26,10 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/sign-in")
 
-  const [profile, stats, userBadges, streak] = await Promise.all([
+  const [profile, stats, allBadges, userBadges, streak] = await Promise.all([
     getProfile(user.id),
     getDashboardStats(user.id),
+    getAllBadges(),
     getUserBadges(user.id),
     getUserStreak(user.id),
   ])
@@ -96,9 +98,14 @@ export default async function ProfilePage() {
       {/* Badges */}
       <div className="space-y-3">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Badges · {userBadges.filter((ub) => ub.badges !== null).length} earned
+          Badges · {userBadges.length} / {allBadges.length} earned
         </p>
-        <BadgeShelf userBadges={userBadges as Parameters<typeof BadgeShelf>[0]["userBadges"]} />
+        <BadgeShelf allBadges={allBadges} earnedSlugs={userBadges} />
+      </div>
+
+      {/* Danger zone */}
+      <div className="pt-2 border-t border-border flex justify-end">
+        <DeleteAccountButton />
       </div>
 
     </div>

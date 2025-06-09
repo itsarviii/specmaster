@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -30,6 +31,7 @@ function GoogleIcon() {
 
 export function SignInForm() {
   const [serverError, setServerError] = useState<string | null>(null)
+  const [hint, setHint] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   const {
@@ -40,9 +42,13 @@ export function SignInForm() {
 
   function onSubmit(values: FormValues) {
     setServerError(null)
+    setHint(null)
     startTransition(async () => {
       const result = await signIn(values.email, values.password)
-      if (result?.error) setServerError(result.error)
+      if (result?.error) {
+        setServerError(result.error)
+        setHint(result.hint ?? null)
+      }
     })
   }
 
@@ -63,7 +69,7 @@ export function SignInForm() {
         <Button
           type="button"
           variant="outline"
-          className="w-full gap-2"
+          className={cn("w-full gap-2 transition-colors", hint === "google" && "border-primary text-primary")}
           onClick={handleGoogle}
           disabled={isPending}
         >

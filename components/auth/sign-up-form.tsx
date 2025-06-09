@@ -34,6 +34,7 @@ function GoogleIcon() {
 
 export function SignUpForm() {
   const [serverError, setServerError] = useState<string | null>(null)
+  const [hint, setHint] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   const {
@@ -44,9 +45,13 @@ export function SignUpForm() {
 
   function onSubmit(values: FormValues) {
     setServerError(null)
+    setHint(null)
     startTransition(async () => {
       const result = await signUp(values.email, values.password)
-      if (result?.error) setServerError(result.error)
+      if (result?.error) {
+        setServerError(result.error)
+        setHint(result.hint ?? null)
+      }
     })
   }
 
@@ -128,7 +133,16 @@ export function SignUpForm() {
           </div>
 
           {serverError && (
-            <p className="text-xs text-destructive text-center">{serverError}</p>
+            <div className="text-xs text-destructive text-center space-y-1">
+              <p>{serverError}</p>
+              {hint === "signin" && (
+                <p>
+                  <Link href="/sign-in" className="underline underline-offset-2 hover:text-destructive/80">
+                    Sign in instead →
+                  </Link>
+                </p>
+              )}
+            </div>
           )}
 
           <Button type="submit" className="w-full" disabled={isPending}>

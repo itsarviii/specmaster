@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react"
 import { Pencil, X, Check, Zap } from "lucide-react"
 import { toast } from "sonner"
-import { Badge } from "@/components/ui/badge"
 import { AvatarPicker } from "@/components/profile/avatar-picker"
 import { updateProfileAction } from "@/lib/actions/profiles"
 import { EXPERIENCE_LABELS, ROLE_LABELS } from "@/lib/constants"
@@ -53,9 +52,9 @@ export function ProfileHero({
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
+    <div className="rounded-xl border border-border bg-card">
       {/* Banner */}
-      <div className="h-24 bg-linear-to-br from-primary/25 via-primary/8 to-muted/20 relative">
+      <div className="h-24 bg-linear-to-br from-primary/25 via-primary/8 to-muted/20 relative rounded-t-xl overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,var(--tw-gradient-stops))] from-primary/10 to-transparent" />
       </div>
 
@@ -135,18 +134,12 @@ export function ProfileHero({
             </div>
           )}
 
-          <div className="flex items-center gap-2 flex-wrap">
-            {profile?.experience_level && (
-              <Badge variant="secondary" className="text-xs">
-                {EXPERIENCE_LABELS[profile.experience_level]}
-              </Badge>
-            )}
-            {profile?.role && (
-              <Badge variant="outline" className="text-xs">
-                {ROLE_LABELS[profile.role]}
-              </Badge>
-            )}
-            <span className="text-xs text-muted-foreground">{totalXp} XP total</span>
+          <div className="flex items-center gap-1.5 flex-wrap text-xs text-muted-foreground">
+            {profile?.role && <span>{ROLE_LABELS[profile.role]}</span>}
+            {profile?.role && profile?.experience_level && <span>·</span>}
+            {profile?.experience_level && <span>{EXPERIENCE_LABELS[profile.experience_level]}</span>}
+            {(profile?.role || profile?.experience_level) && <span>·</span>}
+            <span>{totalXp} XP total</span>
           </div>
 
           {!isMaxLevel && (
