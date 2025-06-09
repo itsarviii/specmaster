@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useEffect } from "react"
 import Link from "next/link"
-import { CheckCircle2, XCircle, RotateCcw, Gamepad2 } from "lucide-react"
+import { toast } from "sonner"
+import { CheckCircle2, XCircle, RotateCcw, Gamepad2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { completeGameAction } from "@/lib/actions/games"
 import type { GameQuestion } from "@/lib/db/games"
@@ -180,6 +181,7 @@ export function GameSession({ questions, mode, modeLabel }: GameSessionProps) {
       if (index + 1 >= total) {
         startTransition(async () => {
           const res = await completeGameAction(mode, newScore, total)
+          res.newBadges.forEach((b) => toast.success(`${b.icon} Badge unlocked: ${b.name}`))
           setResults(res)
         })
       } else {
@@ -241,6 +243,13 @@ export function GameSession({ questions, mode, modeLabel }: GameSessionProps) {
           )
         })}
       </div>
+
+      <Link
+        href="/games"
+        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-border text-sm text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
+      >
+        <X className="size-3.5" /> Quit game
+      </Link>
     </div>
   )
 }

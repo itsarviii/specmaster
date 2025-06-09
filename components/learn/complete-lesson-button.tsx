@@ -41,11 +41,12 @@ export function CompleteLessonButton({
       setCompleted(true)
       if (!result.alreadyDone) {
         toast.success(`+${xpReward} XP earned`)
+        result.newBadges?.forEach((b) => toast.success(`${b.icon} Badge unlocked: ${b.name}`))
       }
       if (nextLessonSlug) {
         router.push(`/paths/${pathSlug}/${nextLessonSlug}`)
       } else {
-        toast.success("Path complete!")
+        toast.success("Path complete! 🎓")
         router.push(`/paths/${pathSlug}`)
       }
     })

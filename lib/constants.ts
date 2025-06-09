@@ -68,8 +68,8 @@ export const BADGE_SLUGS = {
   STREAK_30: "streak-30",
   FIRST_GAME: "first-game",
   PERFECT_CHALLENGE: "perfect-challenge",
-  SPEED_POURER: "speed-pourer",
-  MEMORY_LANE: "memory-lane",
+  COLLECTOR: "collector",
+  DEDICATED: "dedicated",
 } as const
 
 export const LEVEL_TITLES = [

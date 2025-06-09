@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
-import { getRecipes, getSavedRecipeIds } from "@/lib/db/recipes"
+import { getRecipes, getSavedRecipes, getSavedRecipeIds } from "@/lib/db/recipes"
 import { PageHeader } from "@/components/layout/page-header"
 import { RecipeGrid } from "@/components/recipes/recipe-grid"
 import { RecipeSearch } from "@/components/recipes/recipe-search"
@@ -15,6 +15,7 @@ interface SearchParams {
   difficulty?: string
   method?: string
   page?: string
+  saved?: string
 }
 
 export default async function RecipesPage({
@@ -24,14 +25,27 @@ export default async function RecipesPage({
 }) {
   const params = await searchParams
   const page = Number(params.page) || 1
+  const showSaved = params.saved === "1"
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [{ recipes, total }, savedIds] = await Promise.all([
-    getRecipes({ ...params, page }),
-    user ? getSavedRecipeIds(user.id) : Promise.resolve([]),
-  ])
+  let recipes, total, savedIds: string[]
+
+  if (showSaved && user) {
+    const saved = await getSavedRecipes(user.id)
+    recipes = saved
+    total = saved.length
+    savedIds = saved.map((r) => r.id)
+  } else {
+    const [result, ids] = await Promise.all([
+      getRecipes({ ...params, page }),
+      user ? getSavedRecipeIds(user.id) : Promise.resolve([]),
+    ])
+    recipes = result.recipes
+    total = result.total
+    savedIds = ids
+  }
 
   const totalPages = Math.ceil(total / RECIPES_PER_PAGE)
 
@@ -39,23 +53,52 @@ export default async function RecipesPage({
     <div className="space-y-6">
       <PageHeader
         title="Recipes"
-        description={`${total} cocktails in the library.`}
-      />
+        description={showSaved ? `${total} saved recipe${total === 1 ? "" : "s"}` : `${total} cocktails in the library.`}
+      >
+        {user && (
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
+            <Link
+              href="/recipes"
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${!showSaved ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              All
+            </Link>
+            <Link
+              href="/recipes?saved=1"
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${showSaved ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              Saved
+            </Link>
+          </div>
+        )}
+      </PageHeader>
 
-      <Suspense>
-        <RecipeSearch initialValue={params.q ?? ""} />
-        <div className="mt-4">
-          <RecipeFilters
-            initialSpirit={params.spirit}
-            initialDifficulty={params.difficulty}
-            initialMethod={params.method}
-          />
+      {!showSaved && (
+        <Suspense>
+          <RecipeSearch initialValue={params.q ?? ""} />
+          <div className="mt-4">
+            <RecipeFilters
+              initialSpirit={params.spirit}
+              initialDifficulty={params.difficulty}
+              initialMethod={params.method}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {showSaved && recipes.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center space-y-2">
+          <p className="text-sm font-semibold text-muted-foreground">No saved recipes yet</p>
+          <p className="text-xs text-muted-foreground">Tap the bookmark icon on any recipe to save it here.</p>
+          <Link href="/recipes" className="inline-block mt-2 text-xs text-primary hover:underline underline-offset-2">
+            Browse all recipes →
+          </Link>
         </div>
-      </Suspense>
+      ) : (
+        <RecipeGrid recipes={recipes} savedIds={savedIds} />
+      )}
 
-      <RecipeGrid recipes={recipes} savedIds={savedIds} />
-
-      {totalPages > 1 && (
+      {!showSaved && totalPages > 1 && (
         <div className="flex items-center justify-center gap-2">
           {page > 1 ? (
             <Link

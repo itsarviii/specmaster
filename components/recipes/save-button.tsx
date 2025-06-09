@@ -22,13 +22,17 @@ export function SaveButton({ recipeId, initialSaved, className }: SaveButtonProp
     const next = !isSaved
     setIsSaved(next)
     startTransition(async () => {
-      const action = next ? saveRecipeAction : unsaveRecipeAction
-      const result = await action(recipeId)
-      if (result?.error) {
-        setIsSaved(!next)
-        toast.error("Something went wrong")
+      if (!next) {
+        const result = await unsaveRecipeAction(recipeId)
+        if (result?.error) { setIsSaved(!next); toast.error("Something went wrong") }
+        else toast.success("Removed from collection")
       } else {
-        toast.success(next ? "Saved to collection" : "Removed from collection")
+        const result = await saveRecipeAction(recipeId)
+        if (result?.error) { setIsSaved(!next); toast.error("Something went wrong") }
+        else {
+          toast.success("Saved to collection")
+          result.newBadges?.forEach((b) => toast.success(`${b.icon} Badge unlocked: ${b.name}`))
+        }
       }
     })
   }

@@ -17,8 +17,8 @@ const badges = [
   { slug: "streak-30",             name: "Monthly Master",   description: "Kept a 30-day learning streak.",           icon: "⚡" },
   { slug: "first-game",            name: "Game On",          description: "Played your first bartending game.",       icon: "🎮" },
   { slug: "perfect-challenge",     name: "Perfectionist",    description: "Scored 100% on any game.",                icon: "⭐" },
-  { slug: "speed-pourer",          name: "Speed Pourer",     description: "Answered 5 questions under 3 seconds each.", icon: "💨" },
-  { slug: "memory-lane",           name: "Memory Lane",      description: "Completed all three game modes.",         icon: "🧠" },
+  { slug: "collector",             name: "Collector",        description: "Saved 5 cocktail recipes.",                icon: "📚" },
+  { slug: "dedicated",             name: "Dedicated",        description: "Completed 10 lessons.",                   icon: "🏅" },
 ]
 
 async function main() {

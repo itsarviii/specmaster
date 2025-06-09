@@ -8,10 +8,12 @@ async function tryAwardBadge(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   slug: string
-) {
-  const { data: badge } = await supabase.from("badges").select("id").eq("slug", slug).single()
-  if (!badge) return
-  await supabase.from("user_badges").insert({ user_id: userId, badge_id: badge.id })
+): Promise<{ name: string; icon: string } | null> {
+  const { data: badge } = await supabase.from("badges").select("id, name, icon").eq("slug", slug).single()
+  if (!badge) return null
+  const { error } = await supabase.from("user_badges").insert({ user_id: userId, badge_id: badge.id })
+  if (error) return null
+  return { name: badge.name, icon: badge.icon }
 }
 
 async function updateStreak(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
@@ -105,9 +107,24 @@ export async function completeLesson(lessonId: string, pathId: string, xpReward:
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
 
-  if ((lessonCount ?? 0) === 1) await tryAwardBadge(supabase, user.id, BADGE_SLUGS.FIRST_LESSON_COMPLETE)
-  if (newStreak >= 7) await tryAwardBadge(supabase, user.id, BADGE_SLUGS.STREAK_7)
-  if (newStreak >= 30) await tryAwardBadge(supabase, user.id, BADGE_SLUGS.STREAK_30)
+  const newBadges: { name: string; icon: string }[] = []
+
+  if ((lessonCount ?? 0) === 1) {
+    const b = await tryAwardBadge(supabase, user.id, BADGE_SLUGS.FIRST_LESSON_COMPLETE)
+    if (b) newBadges.push(b)
+  }
+  if ((lessonCount ?? 0) === 10) {
+    const b = await tryAwardBadge(supabase, user.id, BADGE_SLUGS.DEDICATED)
+    if (b) newBadges.push(b)
+  }
+  if (newStreak >= 7) {
+    const b = await tryAwardBadge(supabase, user.id, BADGE_SLUGS.STREAK_7)
+    if (b) newBadges.push(b)
+  }
+  if (newStreak >= 30) {
+    const b = await tryAwardBadge(supabase, user.id, BADGE_SLUGS.STREAK_30)
+    if (b) newBadges.push(b)
+  }
 
   // Check path completion
   const { data: path } = await supabase
@@ -135,12 +152,13 @@ export async function completeLesson(lessonId: string, pathId: string, xpReward:
         .eq("user_id", user.id)
         .eq("path_id", pathId)
 
-      await tryAwardBadge(supabase, user.id, BADGE_SLUGS.FIRST_PATH_COMPLETE)
+      const b = await tryAwardBadge(supabase, user.id, BADGE_SLUGS.FIRST_PATH_COMPLETE)
+      if (b) newBadges.push(b)
     }
   }
 
   revalidatePath("/paths")
   revalidatePath("/dashboard")
   revalidatePath("/profile")
-  return { success: true, xpEarned: xpReward }
+  return { success: true, xpEarned: xpReward, newBadges }
 }

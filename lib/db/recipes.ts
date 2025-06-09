@@ -72,6 +72,16 @@ export async function getSpotlightRecipe(): Promise<Recipe | null> {
   return (data?.[0] ?? null) as Recipe | null
 }
 
+export async function getSavedRecipes(userId: string): Promise<Recipe[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("user_saved_recipes")
+    .select("recipes(id,slug,name,image_url,spirit_category,difficulty,prep_time_mins,glassware,method,flavor_tags,created_at,is_published)")
+    .eq("user_id", userId)
+    .order("saved_at", { ascending: false })
+  return ((data ?? []).map((r: { recipes: unknown }) => r.recipes).filter(Boolean)) as Recipe[]
+}
+
 export async function getSavedRecipeIds(userId: string): Promise<string[]> {
   const supabase = await createClient()
   const { data } = await supabase

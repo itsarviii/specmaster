@@ -1,7 +1,6 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import { revalidatePath } from "next/cache"
 import { BADGE_SLUGS, XP_REWARDS } from "@/lib/constants"
 
 type BadgeResult = { name: string; icon: string } | null
@@ -64,9 +63,6 @@ export async function updateStreakAction() {
 
   if (newStreak >= 7) await tryAwardBadge(supabase, user.id, BADGE_SLUGS.STREAK_7)
   if (newStreak >= 30) await tryAwardBadge(supabase, user.id, BADGE_SLUGS.STREAK_30)
-
-  revalidatePath("/dashboard")
-  revalidatePath("/profile")
 }
 
 export async function completeGameAction(
@@ -79,7 +75,11 @@ export async function completeGameAction(
   if (!user) return { xp: 0, newBadges: [] }
 
   const isPerfect = correctAnswers === totalQuestions && totalQuestions > 0
-  const xp = Math.round((correctAnswers / totalQuestions) * XP_REWARDS.FLASHCARD_SESSION)
+  const maxXp =
+    mode === "flashcard" ? XP_REWARDS.FLASHCARD_SESSION :
+    mode === "ingredient_challenge" ? XP_REWARDS.INGREDIENT_CHALLENGE :
+    XP_REWARDS.NAME_THAT_COCKTAIL
+  const xp = Math.round((correctAnswers / totalQuestions) * maxXp)
 
   await supabase.from("user_xp_events").insert({
     user_id: user.id,
@@ -99,15 +99,5 @@ export async function completeGameAction(
     if (b2) newBadges.push(b2)
   }
 
-  revalidatePath("/profile")
-  revalidatePath("/dashboard")
   return { xp, newBadges }
-}
-
-export async function awardFirstRecipeSavedBadge() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
-  await tryAwardBadge(supabase, user.id, BADGE_SLUGS.FIRST_RECIPE_SAVED)
-  revalidatePath("/profile")
 }

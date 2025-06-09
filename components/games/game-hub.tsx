@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 const MODES = [
@@ -34,23 +35,23 @@ const MODES = [
   },
 ]
 
-const SCOPES = [
-  { id: "random", label: "Full Library", description: "Any recipe from the collection" },
-  { id: "saved",  label: "My Saves",    description: "Only cocktails you've saved" },
-]
+const MIN_SAVES = 4
 
-export function GameHub() {
+export function GameHub({ savedCount }: { savedCount: number }) {
   const [mode, setMode] = useState<string | null>(null)
   const [scope, setScope] = useState("random")
   const router = useRouter()
 
+  const notEnoughSaves = scope === "saved" && savedCount < MIN_SAVES
+  const canStart = !!mode && !notEnoughSaves
+
   function handleStart() {
-    if (!mode) return
+    if (!canStart) return
     router.push(`/games/${mode}?scope=${scope}`)
   }
 
   return (
-    <div className="max-w-xl space-y-8">
+    <div className="space-y-8">
 
       {/* Mode picker */}
       <div className="space-y-3">
@@ -88,7 +89,10 @@ export function GameHub() {
       <div className="space-y-3">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Recipe pool</p>
         <div className="grid grid-cols-2 gap-2.5">
-          {SCOPES.map((s) => (
+          {[
+            { id: "random", label: "Full Library", description: "Any recipe from the collection" },
+            { id: "saved",  label: "My Saves",    description: `${savedCount} saved recipe${savedCount === 1 ? "" : "s"}` },
+          ].map((s) => (
             <button
               key={s.id}
               onClick={() => setScope(s.id)}
@@ -104,11 +108,20 @@ export function GameHub() {
             </button>
           ))}
         </div>
+
+        {notEnoughSaves && (
+          <p className="text-xs text-amber-400">
+            Need at least {MIN_SAVES} saves to use this pool.{" "}
+            <Link href="/recipes" className="underline underline-offset-2 hover:text-amber-300 transition-colors">
+              Browse recipes →
+            </Link>
+          </p>
+        )}
       </div>
 
       <button
         onClick={handleStart}
-        disabled={!mode}
+        disabled={!canStart}
         className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
       >
         Let&apos;s go →

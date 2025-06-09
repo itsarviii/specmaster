@@ -97,13 +97,11 @@ export async function getGameQuestions(
       .eq("user_id", userId)
     const ids = (saved ?? []).map((r: { recipe_id: string }) => r.recipe_id)
 
-    if (ids.length >= 4) {
-      const { data } = await supabase.from("recipes").select(select).in("id", ids).eq("is_published", true)
-      pool = (data ?? []) as RecipeRow[]
-    }
-  }
+    if (ids.length < 4) return []
 
-  if (pool.length < 4) {
+    const { data } = await supabase.from("recipes").select(select).in("id", ids).eq("is_published", true)
+    pool = (data ?? []) as RecipeRow[]
+  } else {
     const { data } = await supabase.from("recipes").select(select).eq("is_published", true).limit(80)
     pool = (data ?? []) as RecipeRow[]
   }
@@ -113,14 +111,26 @@ export async function getGameQuestions(
   return shuffle(pool).slice(0, 10).map((r) => buildQuestion(mode, r, pool))
 }
 
-export async function getUserBadges(userId: string) {
+export async function getAllBadges() {
+  const supabase = await createClient()
+  const { data } = await supabase.from("badges").select("id, slug, name, description, icon").order("id")
+  return data ?? []
+}
+
+export async function getUserBadges(userId: string): Promise<string[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from("user_badges")
-    .select("earned_at, badges(id, slug, name, description, icon)")
+    .select("badges(slug)")
     .eq("user_id", userId)
-    .order("earned_at", { ascending: false })
-  return data ?? []
+  if (!data) return []
+  return data
+    .map((row: { badges: { slug: string } | { slug: string }[] | null }) => {
+      const b = row.badges
+      if (!b) return null
+      return Array.isArray(b) ? b[0]?.slug : b.slug
+    })
+    .filter((s): s is string => Boolean(s))
 }
 
 export async function getUserStreak(userId: string) {
