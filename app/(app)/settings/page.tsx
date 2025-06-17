@@ -1,7 +1,10 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getProfile } from "@/lib/db/profiles"
 import { PageHeader } from "@/components/layout/page-header"
+
+export const metadata: Metadata = { title: "Settings" }
 import { ProfileForm } from "@/components/auth/profile-form"
 import { PasswordForm } from "@/components/auth/password-form"
 

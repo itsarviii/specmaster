@@ -1,7 +1,10 @@
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { getLearningPaths, getUserEnrollments, getUserLessonCompletions } from "@/lib/db/learning-paths"
 import { PageHeader } from "@/components/layout/page-header"
 import { PathCard } from "@/components/learn/path-card"
+
+export const metadata: Metadata = { title: "Learn" }
 
 export default async function PathsPage() {
   const supabase = await createClient()

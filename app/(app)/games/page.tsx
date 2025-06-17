@@ -1,6 +1,9 @@
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { GameHub } from "@/components/games/game-hub"
 import { PageHeader } from "@/components/layout/page-header"
+
+export const metadata: Metadata = { title: "Games" }
 
 export default async function GamesPage() {
   const supabase = await createClient()

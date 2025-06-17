@@ -21,36 +21,6 @@ export function formatDuration(minutes: number): string {
   return m === 0 ? `${h}h` : `${h}h ${m}m`
 }
 
-export function xpToLevel(totalXp: number): { level: number; title: string; progress: number; nextLevelXp: number } {
-  const thresholds = [0, 200, 500, 1000, 1800, 3000, 4500, 6500, 9000, 12000, 16000]
-  const titles = [
-    "Bar Back",
-    "Barkeep",
-    "Pour Master",
-    "Mixologist",
-    "Cocktail Craftsman",
-    "Spirits Expert",
-    "Bar Veteran",
-    "Head Bartender",
-    "Bar Manager",
-    "Master Bartender",
-    "Legendary Barkeep",
-  ]
-
-  let level = 0
-  for (let i = thresholds.length - 1; i >= 0; i--) {
-    if (totalXp >= thresholds[i]) {
-      level = i
-      break
-    }
-  }
-
-  const current = thresholds[level]
-  const next = thresholds[level + 1] ?? thresholds[thresholds.length - 1]
-  const progress = level >= thresholds.length - 1 ? 100 : Math.round(((totalXp - current) / (next - current)) * 100)
-
-  return { level: level + 1, title: titles[level], progress, nextLevelXp: next }
-}
 
 export function calculateStreakStatus(lastActiveDate: string | null): boolean {
   if (!lastActiveDate) return false

@@ -94,9 +94,9 @@ async function main() {
   console.log(`\nFetched ${allDrinks.length} cocktails`)
 
   const slugsSeen = new Set<string>()
-  const recipes = []
-  const ingredientRows = []
-  const stepRows = []
+  const recipes: { id: string; slug: string; name: string; image_url: string; spirit_category: string; difficulty: string; method: string; prep_time_mins: number; glassware: string | null; flavor_tags: string[] }[] = []
+  const ingredientRows: { recipe_id: string; name: string; amount: string | null; sort_order: number }[] = []
+  const stepRows: { recipe_id: string; step_number: number; instruction: string }[] = []
 
   for (const drink of allDrinks) {
     let slug = toSlug(drink.strDrink)

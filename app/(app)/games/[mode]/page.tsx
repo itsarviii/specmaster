@@ -1,8 +1,20 @@
+import type { Metadata } from "next"
 import { notFound, redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getGameQuestions } from "@/lib/db/games"
 import { GameSession } from "@/components/games/game-session"
 import type { GameMode, GameScope } from "@/lib/types"
+
+const MODE_TITLES: Record<string, string> = {
+  flashcard: "Flashcard",
+  ingredient_challenge: "Ingredient Challenge",
+  name_that_cocktail: "Name That Cocktail",
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ mode: string }> }): Promise<Metadata> {
+  const { mode } = await params
+  return { title: MODE_TITLES[mode] ?? "Games" }
+}
 
 const VALID_MODES: GameMode[] = ["flashcard", "ingredient_challenge", "name_that_cocktail"]
 const VALID_SCOPES: GameScope[] = ["random", "saved"]

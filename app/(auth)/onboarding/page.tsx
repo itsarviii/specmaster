@@ -1,7 +1,10 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { OnboardingFlow } from "@/components/auth/onboarding-flow"
 import { AppLogo } from "@/components/app-logo"
+
+export const metadata: Metadata = { title: "Get Started" }
 
 export default async function OnboardingPage() {
   const supabase = await createClient()

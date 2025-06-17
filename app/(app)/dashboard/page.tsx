@@ -1,4 +1,7 @@
+import type { Metadata } from "next"
 import Link from "next/link"
+
+export const metadata: Metadata = { title: "Dashboard" }
 import { ChevronRight, BookOpen, GraduationCap, Clock, Flame } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getInProgressPath } from "@/lib/db/learning-paths"

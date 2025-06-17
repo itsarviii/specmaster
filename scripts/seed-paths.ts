@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js"
-import type { LessonContentBlock } from "@/lib/types"
+import type { LessonContentBlock } from "../lib/types"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

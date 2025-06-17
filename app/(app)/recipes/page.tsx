@@ -1,4 +1,7 @@
+import type { Metadata } from "next"
 import { Suspense } from "react"
+
+export const metadata: Metadata = { title: "Recipes" }
 import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"

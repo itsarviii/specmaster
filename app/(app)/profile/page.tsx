@@ -1,8 +1,11 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getProfile } from "@/lib/db/profiles"
 import { getDashboardStats } from "@/lib/db/stats"
 import { getAllBadges, getUserBadges, getUserStreak } from "@/lib/db/games"
+
+export const metadata: Metadata = { title: "Profile" }
 import { ProfileHero } from "@/components/profile/profile-hero"
 import { BadgeShelf } from "@/components/profile/badge-shelf"
 import { DeleteAccountButton } from "@/components/profile/delete-account-button"
