@@ -9,7 +9,10 @@ export async function signIn(email: string, password: string) {
   if (error) {
     const msg = error.message.toLowerCase()
     if (msg.includes("invalid login credentials") || msg.includes("invalid password")) {
-      return { error: "Wrong email or password. If you signed up with Google, use the button above.", hint: "google" }
+      return { error: "Wrong email or password.", hint: "credentials" }
+    }
+    if (msg.includes("provider") || msg.includes("oauth") || msg.includes("social")) {
+      return { error: "This account uses Google sign-in. Use the button above.", hint: "google" }
     }
     return { error: error.message }
   }
@@ -51,6 +54,13 @@ export async function signInWithGoogle() {
   })
   if (error) return { error: error.message }
   if (data.url) redirect(data.url)
+}
+
+export async function resetPasswordAction(password: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) return { error: error.message }
+  redirect("/dashboard")
 }
 
 export async function deleteAccountAction() {
