@@ -83,7 +83,7 @@ export function OnboardingFlow() {
         <div className="animate-slide-up">
           <div className="text-center mb-8">
             <h1 className="font-display text-2xl font-semibold mb-2">Welcome to SpecMaster</h1>
-            <p className="text-sm text-muted-foreground">Let's set up your profile before you start.</p>
+            <p className="text-sm text-muted-foreground">Let&apos;s set up your profile before you start.</p>
           </div>
 
           <div className="space-y-6">
@@ -99,7 +99,7 @@ export function OnboardingFlow() {
             </div>
 
             <div className="space-y-2">
-              <Label>What's your experience level?</Label>
+              <Label>What&apos;s your experience level?</Label>
               <div className="space-y-3">
             {experienceOptions.map(({ value, label, description, icon: Icon }) => (
               <button

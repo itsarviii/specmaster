@@ -100,10 +100,10 @@ export async function getGameQuestions(
     if (ids.length < 4) return []
 
     const { data } = await supabase.from("recipes").select(select).in("id", ids).eq("is_published", true)
-    pool = (data ?? []) as RecipeRow[]
+    pool = (data ?? []) as unknown as RecipeRow[]
   } else {
     const { data } = await supabase.from("recipes").select(select).eq("is_published", true).limit(80)
-    pool = (data ?? []) as RecipeRow[]
+    pool = (data ?? []) as unknown as RecipeRow[]
   }
 
   if (pool.length < 4) return []

@@ -137,10 +137,8 @@
 
 @layer utilities {
   .glass {
-    background: oklch(0.12 0.01 264 / 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid oklch(0.25 0.01 264 / 0.5);
+    background: oklch(0.12 0.01 264);
+    border: 1px solid oklch(0.25 0.01 264);
   }
 
   .glow-amber {

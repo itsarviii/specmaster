@@ -6,6 +6,7 @@ import { getAllBadges, getUserBadges, getUserStreak } from "@/lib/db/games"
 import { ProfileHero } from "@/components/profile/profile-hero"
 import { BadgeShelf } from "@/components/profile/badge-shelf"
 import { DeleteAccountButton } from "@/components/profile/delete-account-button"
+import { SignOutButton } from "@/components/profile/sign-out-button"
 import { LEVEL_TITLES } from "@/lib/constants"
 import { BookMarked, GraduationCap, Zap, BookOpen, Flame } from "lucide-react"
 
@@ -104,8 +105,13 @@ export default async function ProfilePage() {
       </div>
 
       {/* Danger zone */}
-      <div className="pt-2 border-t border-border flex justify-end">
-        <DeleteAccountButton />
+      <div className="pt-2 border-t border-border flex items-center justify-between">
+        <div className="lg:hidden">
+          <SignOutButton />
+        </div>
+        <div className="lg:ml-auto">
+          <DeleteAccountButton />
+        </div>
       </div>
 
     </div>

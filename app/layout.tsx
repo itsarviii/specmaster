@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     template: "%s | SpecMaster",
   },
   description: "The bartender's learning companion. Master recipes, techniques, and the craft of cocktails.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

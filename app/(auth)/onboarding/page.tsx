@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
-import { GlassWater } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { OnboardingFlow } from "@/components/auth/onboarding-flow"
+import { AppLogo } from "@/components/app-logo"
 
 export default async function OnboardingPage() {
   const supabase = await createClient()
@@ -19,9 +19,8 @@ export default async function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="flex items-center gap-2.5 px-6 h-16 border-b border-border shrink-0">
-        <GlassWater className="size-5 text-primary" />
-        <span className="font-display text-base font-semibold text-foreground">SpecMaster</span>
+      <header className="flex items-center px-6 h-16 border-b border-border shrink-0">
+        <AppLogo size="sm" />
       </header>
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <OnboardingFlow />

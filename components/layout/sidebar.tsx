@@ -8,7 +8,6 @@ import {
   GraduationCap,
   Gamepad2,
   User,
-  GlassWater,
   LogOut,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -16,6 +15,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { getAvatarPreset } from "@/lib/avatar-presets"
+import { AppLogo } from "@/components/app-logo"
 import type { Profile } from "@/lib/types"
 
 const navItems = [
@@ -27,10 +27,11 @@ const navItems = [
 ]
 
 interface SidebarProps {
-  profile: Profile | null
+  profile?: Profile | null
+  profileSlot?: React.ReactNode
 }
 
-export function Sidebar({ profile }: SidebarProps) {
+export function Sidebar({ profile, profileSlot }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -41,15 +42,10 @@ export function Sidebar({ profile }: SidebarProps) {
     router.push("/sign-in")
   }
 
-
-
   return (
     <aside className="hidden lg:flex flex-col fixed inset-y-0 left-0 w-64 border-r border-border bg-card z-40">
-      <div className="flex items-center gap-2.5 px-6 h-16 border-b border-border shrink-0">
-        <GlassWater className="size-6 text-primary" />
-        <span className="font-display text-lg font-semibold tracking-wide text-foreground">
-          SpecMaster
-        </span>
+      <div className="flex items-center px-6 h-16 border-b border-border shrink-0">
+        <AppLogo />
       </div>
 
       <nav className="flex flex-col gap-1 p-3 flex-1 overflow-y-auto">
@@ -74,24 +70,26 @@ export function Sidebar({ profile }: SidebarProps) {
       </nav>
 
       <div className="p-3 border-t border-border shrink-0 space-y-1">
-        <Link
-          href="/profile"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors"
-        >
-          {(() => {
-            const p = getAvatarPreset(profile?.avatar_url ?? null)
-            return (
-              <div className={`size-7 shrink-0 rounded-full border flex items-center justify-center text-base ${p.bg} ${p.border}`}>
-                {p.emoji}
-              </div>
-            )
-          })()}
-          <div className="min-w-0">
-            <p className="text-sm font-medium truncate leading-none">
-              {profile?.display_name ?? "Your profile"}
-            </p>
-          </div>
-        </Link>
+        {profileSlot ?? (
+          <Link
+            href="/profile"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors"
+          >
+            {(() => {
+              const p = getAvatarPreset(profile?.avatar_url ?? null)
+              return (
+                <div className={`size-7 shrink-0 rounded-full border flex items-center justify-center text-base ${p.bg} ${p.border}`}>
+                  {p.emoji}
+                </div>
+              )
+            })()}
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate leading-none">
+                {profile?.display_name ?? "Your profile"}
+              </p>
+            </div>
+          </Link>
+        )}
 
         <button
           onClick={handleSignOut}

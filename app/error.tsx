@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { GlassWater } from "lucide-react"
 
 type Props = {
   error: Error & { digest?: string }
@@ -16,7 +16,7 @@ export default function Error({ error, reset }: Props) {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 text-center">
-      <GlassWater className="size-12 text-primary mb-6 opacity-60" />
+      <Image src="/favicon.svg" alt="" width={56} height={56} className="mb-6 opacity-60" />
       <h1 className="font-display text-2xl font-semibold text-foreground mb-2">
         Something went wrong
       </h1>

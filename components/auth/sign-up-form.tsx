@@ -8,6 +8,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { AuthShell } from "@/components/auth/auth-shell"
 import { signUp, signInWithGoogle } from "@/lib/actions/auth"
 
 const schema = z.object({
@@ -37,11 +38,9 @@ export function SignUpForm() {
   const [hint, setHint] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormValues>({ resolver: zodResolver(schema) })
+  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+  })
 
   function onSubmit(values: FormValues) {
     setServerError(null)
@@ -56,107 +55,104 @@ export function SignUpForm() {
   }
 
   function handleGoogle() {
-    startTransition(async () => {
-      await signInWithGoogle()
-    })
+    startTransition(async () => { await signInWithGoogle() })
   }
 
   return (
-    <div className="w-full max-w-sm animate-fade-in">
-      <div className="text-center mb-8">
-        <h1 className="font-display text-2xl font-semibold mb-2">Create account</h1>
-        <p className="text-sm text-muted-foreground">Start mastering the craft.</p>
-      </div>
-
-      <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full gap-2"
-          onClick={handleGoogle}
-          disabled={isPending}
-        >
-          <GoogleIcon />
-          Continue with Google
-        </Button>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-border" />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="bg-card px-3 text-muted-foreground">or</span>
-          </div>
+    <AuthShell>
+      <div className="w-full max-w-sm animate-fade-in">
+        <div className="mb-8">
+          <h1 className="font-display text-2xl font-bold mb-1.5">Create account</h1>
+          <p className="text-sm text-muted-foreground">Start mastering the craft today.</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              {...register("email")}
-            />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="new-password"
-              {...register("password")}
-            />
-            {errors.password && (
-              <p className="text-xs text-destructive">{errors.password.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="confirmPassword">Confirm password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="new-password"
-              {...register("confirmPassword")}
-            />
-            {errors.confirmPassword && (
-              <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
-            )}
-          </div>
-
-          {serverError && (
-            <div className="text-xs text-destructive text-center space-y-1">
-              <p>{serverError}</p>
-              {hint === "signin" && (
-                <p>
-                  <Link href="/sign-in" className="underline underline-offset-2 hover:text-destructive/80">
-                    Sign in instead →
-                  </Link>
-                </p>
-              )}
-            </div>
-          )}
-
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Creating account…" : "Create account"}
+        <div className="space-y-4">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full gap-2 h-11"
+            onClick={handleGoogle}
+            disabled={isPending}
+          >
+            <GoogleIcon />
+            Continue with Google
           </Button>
-        </form>
-      </div>
 
-      <p className="text-center text-sm text-muted-foreground mt-6">
-        Already have an account?{" "}
-        <Link href="/sign-in" className="text-primary hover:underline font-medium">
-          Sign in
-        </Link>
-      </p>
-    </div>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-background px-3 text-muted-foreground">or</span>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                autoComplete="email"
+                className="h-11"
+                {...register("email")}
+              />
+              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                className="h-11"
+                {...register("password")}
+              />
+              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="confirmPassword">Confirm password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                className="h-11"
+                {...register("confirmPassword")}
+              />
+              {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>}
+            </div>
+
+            {serverError && (
+              <div className="text-xs text-destructive text-center space-y-1">
+                <p>{serverError}</p>
+                {hint === "signin" && (
+                  <p>
+                    <Link href="/sign-in" className="underline underline-offset-2 hover:text-destructive/80">
+                      Sign in instead →
+                    </Link>
+                  </p>
+                )}
+              </div>
+            )}
+
+            <Button type="submit" className="w-full h-11" disabled={isPending}>
+              {isPending ? "Creating account…" : "Create account"}
+            </Button>
+          </form>
+        </div>
+
+        <p className="text-center text-sm text-muted-foreground mt-8">
+          Already have an account?{" "}
+          <Link href="/sign-in" className="text-primary hover:underline font-medium">
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </AuthShell>
   )
 }
